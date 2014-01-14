@@ -3,6 +3,7 @@ var options = {
         minRoomSize: { x: 4, y: 4 },
         maxRoomSize: { x: 12, y: 12 },
         maxRooms: 50,
+        showGrid: true,
         algorithm: 'RoomMaze',
         colors: {},
         regenerate: function() {
@@ -12,11 +13,11 @@ var options = {
 
             time.textContent = (timeEnd - timeStart);
 
-            scale.x = canvas.width / options.size.x,
-            scale.y = canvas.height / options.size.y;
+            scale.x = ~~(canvas.width / options.size.x);
+            scale.y = ~~(canvas.height / options.size.y);
 
             clear();
-            drawGridLines();
+            if(options.showGrid) drawGridLines();
             drawGridMap(grid);
         }
     },
@@ -58,12 +59,11 @@ function initGui() {
     fmrsz.add(options.maxRoomSize, 'y', 4, 64).step(1);
 
     gui.add(options, 'maxRooms', 0, 256).step(1);
+    gui.add(options, 'showGrid').onChange(options.regenerate);
     gui.add(options, 'algorithm', {
         'Room Maze': 'RoomMaze',
         'Simple': 'Simple'
-    }).onChange(function() {
-        options.regenerate();
-    });
+    }).onChange(options.regenerate());
     gui.add(options, 'regenerate');
 }
 
