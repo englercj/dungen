@@ -1,8 +1,8 @@
 var options = {
-        size: { x: 75, y: 75 },
-        minRoomSize: { x: 3, y: 3 },
-        maxRoomSize: { x: 15, y: 15 },
-        maxRooms: 30,
+        size: { x: 100, y: 80 },
+        minRoomSize: { x: 4, y: 4 },
+        maxRoomSize: { x: 12, y: 12 },
+        maxRooms: 50,
         algorithm: 'RoomMaze',
         colors: {},
         regenerate: function() {
@@ -61,6 +61,8 @@ function initGui() {
     gui.add(options, 'algorithm', {
         'Room Maze': 'RoomMaze',
         'Simple': 'Simple'
+    }).onChange(function() {
+        options.regenerate();
     });
     gui.add(options, 'regenerate');
 }
