@@ -4,44 +4,77 @@
     <head>
         <meta charset="utf-8" />
 
-        <title>Title</title>
+        <title>Random Dungeon Generators</title>
 
+        <script src="dat.gui.min.js"></script>
         <script src="helpers.js"></script>
         <script src="algos/SimpleRoomMaze.js"></script>
 
         <script>
-            function run() {
-                var canvas = document.getElementById('view'),
-                    ctx = canvas.getContext('2d'),
-                    size = { x: 512, y: 512 },
-                    minRoomSize = { x: 32, y: 32 },
-                    maxRoomSize = { x: 128, y: 128 },
-                    maxRooms = 64,
-                    grid = SimpleRoomMaze.generate(size, minRoomSize, maxRoomSize, maxRooms);
+            var options = {
+                    size: { x: 128, y: 128 },
+                    minRoomSize: { x: 4, y: 4 },
+                    maxRoomSize: { x: 16, y: 16 },
+                    maxRooms: 32,
+                    regenerate: function() {
+                        var canvas = document.getElementById('view'),
+                            ctx = canvas.getContext('2d'),
+                            timeStart = Date.now(),
+                            grid = SimpleRoomMaze.generate(options.size, options.minRoomSize, options.maxRoomSize, options.maxRooms),
+                            timeEnd = Date.now();
 
-                canvas.width = size.x;
-                canvas.height = size.y;
+                        console.log('Generation took:', (timeEnd - timeStart) + 'ms');
 
-                var xlen = grid.length,
-                    ylen = grid[0].length;
+                        canvas.width = 512;
+                        canvas.height = 512;
 
-                //draw
-                for(var x = 0; x < xlen; ++x) {
-                    for(var y = 0; y < ylen; ++y) {
-                        var tile = grid[x][y];
+                        var xlen = grid.length,
+                            ylen = grid[0].length,
+                            xscale = canvas.width / options.size.x,
+                            yscale = canvas.height / options.size.y;
 
-                        if (tile === helpers.TILE_TYPE.EMPTY) this.ctx.fillStyle = '#351330';
-                        else if (tile === helpers.TILE_TYPE.FLOOR) this.ctx.fillStyle = '#64908A';
-                        else if (tile === helpers.TILE_TYPE.WALL) this.ctx.fillStyle = '#424254';
+                        //draw
+                        for(var x = 0; x < xlen; ++x) {
+                            for(var y = 0; y < ylen; ++y) {
+                                var tile = grid[x][y];
 
-                        ctx.fillRect(x, y);
+                                if (tile === helpers.TILE_TYPE.EMPTY) ctx.fillStyle = '#351330';
+                                else if (tile === helpers.TILE_TYPE.FLOOR) ctx.fillStyle = '#64908A';
+                                else if (tile === helpers.TILE_TYPE.WALL) ctx.fillStyle = '#424254';
+
+                                ctx.fillRect(x * xscale, y * yscale, xscale, yscale);
+                            }
+                        }
                     }
-                }
+                },
+                gui = null;
+
+            function init() {
+                gui = new dat.GUI();
+                initGui();
+                options.regenerate();
+            }
+
+            function initGui() {
+                var fsz = gui.addFolder('Size');
+                fsz.add(options.size, 'x', 16, 512).step(1);
+                fsz.add(options.size, 'y', 16, 512).step(1);
+
+                var frsz = gui.addFolder('Min Room Size');
+                frsz.add(options.minRoomSize, 'x', 3, 64).step(1);
+                frsz.add(options.minRoomSize, 'y', 3, 64).step(1);
+
+                var fmrsz = gui.addFolder('Max Room Size');
+                fmrsz.add(options.maxRoomSize, 'x', 4, 64).step(1);
+                fmrsz.add(options.maxRoomSize, 'y', 4, 64).step(1);
+
+                gui.add(options, 'maxRooms', 0, 256).step(1);
+                gui.add(options, 'regenerate');
             }
         </script>
     </head>
 
-    <body onload="run">
+    <body onload="init();">
         <!-- Main Content -->
         <section>
             <canvas id="view"></canvas>

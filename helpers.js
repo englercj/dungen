@@ -21,11 +21,11 @@ var helpers = {
         if(!end || end < 0)
             end = array.length - 1;
 
-        return array[Helpers.randInt(start, end)];
+        return array[helpers.randInt(start, end)];
     },
 
     // useful constants
-    TILE_TYPES: {
+    TILE_TYPE: {
         EMPTY: 0,
         WALL: 1,
         FLOOR: 2
