@@ -9,6 +9,7 @@
         <script src="dat.gui.min.js"></script>
         <script src="helpers.js"></script>
         <script src="algos/SimpleRoomMaze.js"></script>
+        <script src="algos/simple.js"></script>
 
         <script>
             var options = {
@@ -16,11 +17,12 @@
                     minRoomSize: { x: 4, y: 4 },
                     maxRoomSize: { x: 16, y: 16 },
                     maxRooms: 32,
+                    algorithm: 'SimpleRoomMaze',
                     regenerate: function() {
                         var canvas = document.getElementById('view'),
                             ctx = canvas.getContext('2d'),
                             timeStart = Date.now(),
-                            grid = SimpleRoomMaze.generate(options.size, options.minRoomSize, options.maxRoomSize, options.maxRooms),
+                            grid = window[options.algorithm].generate(options.size, options.minRoomSize, options.maxRoomSize, options.maxRooms),
                             timeEnd = Date.now();
 
                         console.log('Generation took:', (timeEnd - timeStart) + 'ms');
@@ -69,6 +71,10 @@
                 fmrsz.add(options.maxRoomSize, 'y', 4, 64).step(1);
 
                 gui.add(options, 'maxRooms', 0, 256).step(1);
+                gui.add(options, 'algorithm', {
+                    'Room Maze': 'SimpleRoomMaze',
+                    'Simple': 'Simple'
+                });
                 gui.add(options, 'regenerate');
             }
         </script>

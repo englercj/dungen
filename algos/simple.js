@@ -2,7 +2,9 @@ var Simple = {
     map: null,
     map_size: 64,
     rooms: [],
-    generate: function () {
+    generate: function (gridSize, minRoomSize, maxRoomSize, maxRooms) {
+        this.map_size = gridSize.x;
+
         this.map = [];
         for (var x = 0; x < this.map_size; x++) {
             this.map[x] = [];
@@ -12,8 +14,8 @@ var Simple = {
         }
 
         var room_count = Helpers.GetRandom(10, 20);
-        var min_size = 5;
-        var max_size = 15;
+        var min_size = minRoomSize.x;
+        var max_size = maxRoomSize.x;
 
         for (var i = 0; i < room_count; i++) {
             var room = {};
@@ -81,6 +83,8 @@ var Simple = {
                 }
             }
         }
+
+        return this.map;
     },
     FindClosestRoom: function (room) {
         var mid = {
@@ -167,6 +171,6 @@ var Helpers = {
     }
 };
 
-Dungeon.Generate();
-Renderer.Initialize();
-Renderer.Update(Dungeon.map);
+//Dungeon.Generate();
+//Renderer.Initialize();
+//Renderer.Update(Dungeon.map);
