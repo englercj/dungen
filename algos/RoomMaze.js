@@ -1,6 +1,10 @@
 // Based on: http://breinygames.blogspot.com/2011/07/random-map-generation.html
 
-var SimpleRoomMaze = srm = {
+// Needs improvment:
+// - It is possible with small rooms for it to not be closed (i.e. a wall tile missing)
+// - Walls often double up (more room spacing?)
+
+var RoomMaze = srm = {
     generate: function(gridSize, minRoomSize, maxRoomSize, maxRooms) {
         // 1) Create the grid
         var grid = [];
