@@ -1,8 +1,11 @@
+// Based on: http://bigbadwofl.me/random-dungeon-generator/
+
 var Simple = {
     map: null,
     map_size: 64,
     rooms: [],
     generate: function (gridSize, minRoomSize, maxRoomSize, maxRooms) {
+        this.rooms.length = 0;
         this.map_size = gridSize.x;
 
         this.map = [];
@@ -59,7 +62,7 @@ var Simple = {
                     else pointB.y++;
                 }
 
-                this.map[pointB.x][pointB.y] = 1;
+                this.map[pointB.x][pointB.y] = helpers.TILE_TYPE.FLOOR;// 1;
             }
         }
 
@@ -67,17 +70,17 @@ var Simple = {
             var room = this.rooms[i];
             for (var x = room.x; x < room.x + room.w; x++) {
                 for (var y = room.y; y < room.y + room.h; y++) {
-                    this.map[x][y] = 1;
+                    this.map[x][y] = helpers.TILE_TYPE.FLOOR;// 1;
                 }
             }
         }
 
         for (var x = 0; x < this.map_size; x++) {
             for (var y = 0; y < this.map_size; y++) {
-                if (this.map[x][y] == 1) {
+                if (this.map[x][y] == helpers.TILE_TYPE.FLOOR) {
                     for (var xx = x - 1; xx <= x + 1; xx++) {
                         for (var yy = y - 1; yy <= y + 1; yy++) {
-                            if (this.map[xx][yy] == 0) this.map[xx][yy] = 2;
+                            if (this.map[xx][yy] == 0) this.map[xx][yy] = helpers.TILE_TYPE.WALL;// 2;
                         }
                     }
                 }
