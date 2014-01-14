@@ -5,9 +5,9 @@ var SimpleRoomMaze = srm = {
         // 1) Create the grid
         var grid = [];
         for(var x = 0; x < gridSize.x; ++x) {
-            this.grid[x] = [];
+            grid[x] = [];
             for(var y = 0; y < gridSize.y; ++y) {
-                this.grid[x][y] = helpers.TILE_TYPE.EMPTY;
+                grid[x][y] = helpers.TILE_TYPE.EMPTY;
             }
         }
 
@@ -61,14 +61,17 @@ var SimpleRoomMaze = srm = {
                     break;
             }
 
+            roomPos.x = ~~roomPos.x;
+            roomPos.y = ~~roomPos.y;
+
             // 7) See if there is space for the new room next to the selected wall tile of the selected room.
             // 8) If yes, continue. If no, go back to step 4.
-            if(srm.isSpaceForRoom(grid, gridSize, room)) {
+            if(srm.isSpaceForRoom(grid, gridSize, room, roomPos)) {
                 // 9) Dig out the new room to add it to part of the dungeon, and add it to list of completed rooms.
                 rooms.push(room);
                 srm.placeRoom(grid, room, roomPos.x, roomPos.y);
                 // 10) Turn the wall tile picked in step 5 into a door way to make our new room accessible.
-                srm.connectRooms(branchPos, direction);
+                srm.connectRooms(grid, branchPos);
             }
 
             // 11) Go back to step 4 until the dungeon is complete.
@@ -89,7 +92,7 @@ var SimpleRoomMaze = srm = {
             wall;
 
         for(var x = 0; x < sx; ++x) {
-            tiles[x].push(col = []);
+            tiles.push(col = []);
             for(var y = 0; y < sy; ++y) {
                 if(x === 0 || x === sx - 1 || y === 0 || y === sy - 1) {
                     col.push(helpers.TILE_TYPE.WALL);
@@ -117,6 +120,9 @@ var SimpleRoomMaze = srm = {
         return room;
     },
     placeRoom: function(grid, room, px, py) {
+        px = ~~px;
+        py = ~~py;
+
         room.position.x = px;
         room.position.y = py;
 
@@ -135,25 +141,25 @@ var SimpleRoomMaze = srm = {
     },
     getBranchPosition: function(grid, rooms) {
         var room = helpers.randElm(rooms),
-            wall = helpers.randomElm(room.walls);
+            wall = helpers.randElm(room.walls);
 
         return { x: wall.x + room.position.x, y: wall.y + room.position.y, dir: wall.dir };
     },
-    isSpaceForRoom: function(grid, gridSize, room) {
-        var mx = room.position.x + room.size.x,
-            my = room.position.y + room.size.y;
+    isSpaceForRoom: function(grid, gridSize, room, roomPos) {
+        var mx = roomPos.x + room.size.x,
+            my = roomPos.y + room.size.y;
 
         //check x size
-        if(room.position.x < 0 || mx > gridSize.x)
+        if(roomPos.x < 0 || mx > gridSize.x)
             return false;
 
         //check y size
-        if(room.position.y < 0 || my > gridSize.y)
+        if(roomPos.y < 0 || my > gridSize.y)
             return false;
 
         //check if any tiles of this room intersect another room
-        for(var x = room.position.x; x < mx; ++x) {
-            for(var y = room.position.y; y < my; ++y) {
+        for(var x = roomPos.x; x < mx; ++x) {
+            for(var y = roomPos.y; y < my; ++y) {
                 if(grid[x][y] !== helpers.TILE_TYPE.EMPTY) {
                     return false;
                 }
