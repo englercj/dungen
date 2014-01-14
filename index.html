@@ -1,0 +1,50 @@
+<!doctype html>
+
+<html>
+    <head>
+        <meta charset="utf-8" />
+
+        <title>Title</title>
+
+        <script src="helpers.js"></script>
+        <script src="algos/SimpleRoomMaze.js"></script>
+
+        <script>
+            function run() {
+                var canvas = document.getElementById('view'),
+                    ctx = canvas.getContext('2d'),
+                    size = { x: 512, y: 512 },
+                    minRoomSize = { x: 32, y: 32 },
+                    maxRoomSize = { x: 128, y: 128 },
+                    maxRooms = 64,
+                    grid = SimpleRoomMaze.generate(size, minRoomSize, maxRoomSize, maxRooms);
+
+                canvas.width = size.x;
+                canvas.height = size.y;
+
+                var xlen = grid.length,
+                    ylen = grid[0].length;
+
+                //draw
+                for(var x = 0; x < xlen; ++x) {
+                    for(var y = 0; y < ylen; ++y) {
+                        var tile = grid[x][y];
+
+                        if (tile === helpers.TILE_TYPE.EMPTY) this.ctx.fillStyle = '#351330';
+                        else if (tile === helpers.TILE_TYPE.FLOOR) this.ctx.fillStyle = '#64908A';
+                        else if (tile === helpers.TILE_TYPE.WALL) this.ctx.fillStyle = '#424254';
+
+                        ctx.fillRect(x, y);
+                    }
+                }
+            }
+        </script>
+    </head>
+
+    <body onload="run">
+        <!-- Main Content -->
+        <section>
+            <canvas id="view"></canvas>
+        </section>
+    </body>
+</html>
