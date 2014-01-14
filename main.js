@@ -18,17 +18,24 @@ var options = {
 
             clear();
             if(options.showGrid) drawGridLines();
-            drawGridMap(grid);
+            if(grid) drawGridMap(grid);
         }
     },
     gui,
     canvas,
     ctx,
     time,
-    scale = { x: 1, y: 1 };
+    scale = { x: 1, y: 1 },
+    algorithms = {
+        'Room Maze': 'RoomMaze',
+        'Simple': 'Simple',
+        'ROT.Digger': 'Digger',
+        'ROT.Rogue': 'Rogue',
+        'ROT.Uniform': 'Uniform'
+    };
 
 options.colors[helpers.TILE_TYPE.EMPTY] = '#111';
-options.colors[helpers.TILE_TYPE.FLOOR] = 'rgba(100, 100, 100, 0.5)';
+options.colors[helpers.TILE_TYPE.FLOOR] = 'rgba(100, 100, 100, 0.8)';
 options.colors[helpers.TILE_TYPE.WALL] = 'rgba(246, 203, 24, 0.8)';
 options.colors.grid = 'rgba(255, 255, 255, 0.2)';
 
@@ -60,10 +67,7 @@ function initGui() {
 
     gui.add(options, 'maxRooms', 0, 256).step(1);
     gui.add(options, 'showGrid').onChange(options.regenerate);
-    gui.add(options, 'algorithm', {
-        'Room Maze': 'RoomMaze',
-        'Simple': 'Simple'
-    }).onChange(options.regenerate());
+    gui.add(options, 'algorithm', algorithms).onChange(options.regenerate);
     gui.add(options, 'regenerate');
 }
 
