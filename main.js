@@ -1,5 +1,5 @@
 var options = {
-        size: { x: 100, y: 80 },
+        size: { x: 50, y: 40 },
         minRoomSize: { x: 4, y: 4 },
         maxRoomSize: { x: 12, y: 12 },
         maxRooms: 50,
@@ -32,7 +32,24 @@ var options = {
         'ROT.Digger': 'Digger',
         'ROT.Rogue': 'Rogue',
         'ROT.Uniform': 'Uniform'
-    };
+    },
+    tiles = {
+        floor: { x: 112, y: 64 },
+        wall: { x: 208, y: 48  },
+        wall_n: { x: 208, y: 48  },
+        wall_s: { x: 112, y: 128 },
+        wall_e: { x: 224, y: 208 },
+        wall_w: { x: 192, y: 142 },
+        corner: { x: 192, y: 48  },
+        corner_n: { x: 192, y: 48  },
+        corner_s: { x: 128, y: 128 },
+        corner_e: { x: 160, y: 128 },
+        corner_w: { x: 96 , y: 128 },
+        size: { x: 16, y: 16 }
+    },
+    texture = new Image();
+
+texture.src = 'assets/cave_034-Tileset.png';
 
 options.colors[helpers.TILE_TYPE.EMPTY] = '#111';
 options.colors[helpers.TILE_TYPE.FLOOR] = 'rgba(100, 100, 100, 0.8)';
@@ -45,8 +62,8 @@ function init() {
     ctx = ctx = canvas.getContext('2d');
     time = document.getElementById('time');
 
-    canvas.width = 512;
-    canvas.height = 512;
+    canvas.width = tiles.size.x * options.size.x;
+    canvas.height = tiles.size.y * options.size.y;
 
     initGui();
     options.regenerate();
@@ -82,12 +99,12 @@ function drawGridLines() {
     ctx.beginPath();
 
     //draw grid
-    for(i = 0; i < canvas.width; i += scale.x) {
+    for(i = 0; i < canvas.width; i += tiles.size.x) {// scale.x) {
         ctx.moveTo(0.5 + i, 0);
         ctx.lineTo(0.5 + i, canvas.height);
     }
 
-    for(i = 0; i < canvas.height; i += scale.y) {
+    for(i = 0; i < canvas.height; i += tiles.size.y) {// scale.y) {
         ctx.moveTo(0, 0.5 + i);
         ctx.lineTo(canvas.width, 0.5 + i);
     }
@@ -100,21 +117,52 @@ function drawGridMap(grid) {
     var xlen = grid.length,
         ylen = grid[0].length;
 
+    //draw dungeon grid
     for(var x = 0; x < xlen; ++x) {
         for(var y = 0; y < ylen; ++y) {
             var tile = grid[x][y];
 
-            if(tile === helpers.TILE_TYPE.EMPTY)
+            if(tile & helpers.TILE_TYPE.EMPTY)
                 continue;
 
-            if(tile === helpers.TILE_TYPE.FLOOR)
-                ctx.fillStyle = options.colors[helpers.TILE_TYPE.FLOOR];
-            else if(tile === helpers.TILE_TYPE.WALL)
-                ctx.fillStyle = options.colors[helpers.TILE_TYPE.WALL];// '#424254';
+            if(tile & helpers.TILE_TYPE.FLOOR) {
+                drawTile('floor', x, y);
+                //ctx.fillStyle = options.colors[helpers.TILE_TYPE.FLOOR];
+            }
+            else if(tile & helpers.TILE_TYPE.WALL) {
+                var type = tile & helpers.CORNER ? 'corner' : 'wall';
 
-            ctx.fillRect(x * scale.x, y * scale.y, scale.x, scale.y);
+                if(tile & helpers.DIRECTION.NORTH)
+                    type += '_n';
+                else if(tile & helpers.DIRECTION.SOUTH)
+                    type += '_s';
+                else if(tile & helpers.DIRECTION.EAST)
+                    type += '_e';
+                else if(tile & helpers.DIRECTION.WEST)
+                    type += '_w';
+
+                drawTile(type, x, y);
+                //ctx.fillStyle = options.colors[helpers.TILE_TYPE.WALL];// '#424254';
+                //ctx.fillRect(x * tiles.size.x, y * tiles.size.y, tiles.size.x, tiles.size.y);
+            }
+
+            //ctx.fillRect(x * scale.x, y * scale.y, scale.x, scale.y);
         }
     }
+}
+
+function drawTile(type, x, y) {
+    ctx.drawImage(
+        texture,
+        tiles[type].x,
+        tiles[type].y,
+        tiles.size.x,
+        tiles.size.y,
+        x * tiles.size.x,
+        y * tiles.size.x,
+        tiles.size.x,
+        tiles.size.y
+    );
 }
 
 window.onload = init;

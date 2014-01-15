@@ -32,11 +32,14 @@ var helpers = {
     },
 
     DIRECTION: {
-        NORTH: 'n',
-        SOUTH: 's',
-        EAST: 'e',
-        WEST: 'w'
+        NONE: 1024,
+        NORTH: 2048,
+        SOUTH: 4096,
+        EAST: 8192,
+        WEST: 16384
     },
+
+    CORNER: 65536,
 
     // common classes
     Room: function() {

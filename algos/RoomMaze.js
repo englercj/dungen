@@ -99,22 +99,40 @@ var RoomMaze = srm = {
             tiles.push(col = []);
             for(var y = 0; y < sy; ++y) {
                 if(x === 0 || x === sx - 1 || y === 0 || y === sy - 1) {
-                    col.push(helpers.TILE_TYPE.WALL);
+                    var type = helpers.TILE_TYPE.WALL,
+                        dir = helpers.DIRECTION.NONE,
+                        corner = false;
 
                     //store position of normal walls (not corners)
                     if(y !== 0 && y !== sy - 1) {
                         if(x === 0) {
-                            walls.push({ x: x, y: y, dir: helpers.DIRECTION.WEST });
+                            dir = helpers.DIRECTION.WEST;
                         } else if(x === sx - 1) {
-                            walls.push({ x: x, y: y, dir: helpers.DIRECTION.EAST });
+                            dir = helpers.DIRECTION.EAST;
                         }
                     } else if(x !== 0 && x !== sx - 1) {
                         if(y === 0) {
-                            walls.push({ x: x, y: y, dir: helpers.DIRECTION.NORTH });
+                            dir = helpers.DIRECTION.NORTH;
                         } else if(y === sy - 1) {
-                            walls.push({ x: x, y: y, dir: helpers.DIRECTION.SOUTH });
+                            dir = helpers.DIRECTION.SOUTH;
                         }
                     }
+                    //add corners
+                    else {
+                        corner = true;
+                        if(x === 0 && y === 0) {
+                            dir = helpers.DIRECTION.NORTH;
+                        } else if(x === 0 && y === sy - 1) {
+                            dir = helpers.DIRECTION.WEST;
+                        } else if(x === sx - 1 && y === 0) {
+                            dir = helpers.DIRECTION.EAST;
+                        } else if(x === sx - 1 && y === sy - 1) {
+                            dir = helpers.DIRECTION.SOUTH;
+                        }
+                    }
+
+                    walls.push({ x: x, y: y, dir: dir, corner: corner });
+                    col.push(type | dir | (corner ? helpers.CORNER : 0));
                 } else {
                     col.push(helpers.TILE_TYPE.FLOOR);
                 }
@@ -145,7 +163,7 @@ var RoomMaze = srm = {
     },
     getBranchPosition: function(grid, rooms) {
         var room = helpers.randElm(rooms),
-            wall = helpers.randElm(room.walls);
+            wall = helpers.randElm(room.walls.filter(function(v) { return !v.corner; }));
 
         return { x: wall.x + room.position.x, y: wall.y + room.position.y, dir: wall.dir };
     },
