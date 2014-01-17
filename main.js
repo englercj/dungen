@@ -1,9 +1,9 @@
 var options = {
-        size: { x: 50, y: 40 },
+        size: { x: 64, y: 64 },
         minRoomSize: { x: 4, y: 4 },
-        maxRoomSize: { x: 12, y: 12 },
-        maxRooms: 50,
-        showGrid: true,
+        maxRoomSize: { x: 16, y: 16 },
+        maxRooms: 24,
+        showGrid: false,
         algorithm: 'RoomMaze',
         colors: {},
         regenerate: function() {
@@ -17,8 +17,8 @@ var options = {
             scale.y = ~~(canvas.height / options.size.y);
 
             clear();
-            if(options.showGrid) drawGridLines();
             if(grid) drawGridMap(grid);
+            if(options.showGrid) drawGridLines();
         }
     },
     gui,
@@ -47,7 +47,9 @@ var options = {
         corner_w: { x: 96 , y: 128 },
         size: { x: 16, y: 16 }
     },
-    texture = new Image();
+    texture = new Image(),
+    resizeDrawWait = 250,
+    resizeDrawTimeout = null;
 
 texture.src = 'assets/cave_034-Tileset.png';
 
@@ -59,30 +61,28 @@ options.colors.grid = 'rgba(255, 255, 255, 0.2)';
 function init() {
     gui = new dat.GUI();
     canvas = document.getElementById('view');
-    ctx = ctx = canvas.getContext('2d');
     time = document.getElementById('time');
+    ctx = ctx = canvas.getContext('2d');
 
-    canvas.width = tiles.size.x * options.size.x;
-    canvas.height = tiles.size.y * options.size.y;
-
+    resize(true);
     initGui();
     options.regenerate();
 }
 
 function initGui() {
     var fsz = gui.addFolder('Size');
-    fsz.add(options.size, 'x', 16, 256).step(1);
-    fsz.add(options.size, 'y', 16, 256).step(1);
+    fsz.add(options.size, 'x', 16, 256).step(1).onChange(resize);
+    fsz.add(options.size, 'y', 16, 256).step(1).onChange(resize);
 
     var frsz = gui.addFolder('Min Room Size');
-    frsz.add(options.minRoomSize, 'x', 3, 64).step(1);
-    frsz.add(options.minRoomSize, 'y', 3, 64).step(1);
+    frsz.add(options.minRoomSize, 'x', 4, 16).step(1);
+    frsz.add(options.minRoomSize, 'y', 4, 16).step(1);
 
     var fmrsz = gui.addFolder('Max Room Size');
-    fmrsz.add(options.maxRoomSize, 'x', 4, 64).step(1);
-    fmrsz.add(options.maxRoomSize, 'y', 4, 64).step(1);
+    fmrsz.add(options.maxRoomSize, 'x', 8, 32).step(1);
+    fmrsz.add(options.maxRoomSize, 'y', 8, 32).step(1);
 
-    gui.add(options, 'maxRooms', 0, 256).step(1);
+    gui.add(options, 'maxRooms', 0, 64).step(1);
     gui.add(options, 'showGrid').onChange(options.regenerate);
     gui.add(options, 'algorithm', algorithms).onChange(options.regenerate);
     gui.add(options, 'regenerate');
@@ -163,6 +163,18 @@ function drawTile(type, x, y) {
         tiles.size.x,
         tiles.size.y
     );
+}
+
+function resize(skipRedraw) {
+    canvas.width = tiles.size.x * options.size.x;
+    canvas.height = tiles.size.y * options.size.y;
+
+    if(!skipRedraw) {
+        clearTimeout(resizeDrawTimeout);
+        resizeDrawTimeout = setTimeout(function() {
+            options.regenerate();
+        }, resizeDrawWait);
+    }
 }
 
 window.onload = init;
